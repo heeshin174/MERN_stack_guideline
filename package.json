@@ -1,0 +1,33 @@
+{
+  "name": "mern_shopping_list",
+  "version": "1.0.0",
+  "description": "Shopping List built with the MERN stack",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "client-install": "npm install --prefix client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/heeshin174/MERN_Shopping_List.git"
+  },
+  "author": "Heechul Shin <heeshin174@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/heeshin174/MERN_Shopping_List/issues"
+  },
+  "homepage": "https://github.com/heeshin174/MERN_Shopping_List#readme",
+  "dependencies": {
+    "concurrently": "^7.0.0",
+    "dotenv": "^14.3.2",
+    "express": "^4.17.2",
+    "mongoose": "^6.1.8"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.5"
+  }
+}
