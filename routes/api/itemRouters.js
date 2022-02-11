@@ -1,11 +1,14 @@
 import express from "express";
-import Item from "../../models/Item.js";
+import Item from "../../models/item.js";
 
 const router = express.Router();
 
-// @route GET api/items
-// @desc Get All Items
-// @access Public
+/**
+ * @route GET api/items
+ * @desc Get All Items
+ * @access Public
+ */
+
 // Since we are already in the "/api/items" from server.js, we just need a '/'
 // '/' represents the actual endpoint since we're using the router.
 // If you define it in the server.js, we need to write app.get("./api/items");

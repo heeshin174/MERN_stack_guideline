@@ -1,25 +1,35 @@
 import express from "express";
-import mongoose from "mongoose";
-import itemRoutes from "./routes/api/items.js";
-import config from "./config/index.js";
+import itemRoutes from "./routes/api/itemRouters.js";
+import goalRoutes from "./routes/api/goalRouters.js";
+import { errorHandler } from "./middleware/errorMiddleware.js";
+import colors from "colors";
+import connectDB from "./config/db.js";
+import dotenv from "dotenv";
+
+dotenv.config();
+connectDB();
 
 const app = express();
-const { MONGO_URI } = config;
 
-// Used to parse JSON bodies
+// Bodyparser Middleware
 app.use(express.json());
-
-// Connect to Mongo
-// mongoose.connect returns Promise object
-mongoose
-  .connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB Connected..."))
-  .catch((err) => console.log(err.massage));
+app.use(express.urlencoded({ extended: false }));
 
 // Use Routes
 app.use("/api/items", itemRoutes);
+app.use("/api/goals", goalRoutes);
+
+// Error Middleware: override default express js error handler
+app.use(errorHandler);
+
+// Serve static assets if in production
+if (process.env.NODE_ENV === "production") {
+  // Set static folder
+  app.use(express.static("client/build"));
+
+  // app.get('*', (req, res) => {
+  //   res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  // });
+}
 
 export default app;

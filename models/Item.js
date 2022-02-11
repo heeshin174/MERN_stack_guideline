@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
-// Create Schema
+// Create a Item Schema
 const ItemSchema = new Schema({
   name: {
     type: String,
