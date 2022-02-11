@@ -1,3 +1,5 @@
+// This errorHandler will override express js default error handler.
+// Default error handler (HTML) => errorHandler (JSON object)
 export const errorHandler = (err, req, res, next) => {
   const statusCode = res.statusCode ? res.statusCode : 500;
 

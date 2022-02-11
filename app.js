@@ -5,6 +5,7 @@ import { errorHandler } from "./middleware/errorMiddleware.js";
 import colors from "colors";
 import connectDB from "./config/db.js";
 import dotenv from "dotenv";
+import userRoutes from "./routes/api/userRouters.js";
 
 dotenv.config();
 connectDB();
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: false }));
 // Use Routes
 app.use("/api/items", itemRoutes);
 app.use("/api/goals", goalRoutes);
+app.use("/api/users", userRoutes);
 
 // Error Middleware: override default express js error handler
 app.use(errorHandler);

@@ -1,11 +1,11 @@
-# MERN Shopping List
+# MERN Tutorial
 
 Learn the MERN Stack
 
-M: MongoDB (Database)
-E: Express Js (Server)
-R: React Js (Frontend)
-N: Node Js
+- M: MongoDB (Database)
+- E: Express Js (Server)
+- R: React Js (Frontend)
+- N: Node Js
 
 ## Used Technologies
 
@@ -16,6 +16,7 @@ N: Node Js
 - Heroku [Heroku](https://www.heroku.com/)
 - mongoDB
 - React js
+- Redux-toolkit
 - Express js
 
 ## Beginning from scratch
@@ -528,15 +529,607 @@ Same as POST request
 > $ git commit -m "Initial REST API for goals"
 ```
 
-## 3. JWT Authentication
+## 3. JWT Authentication (Signup and Login)
 
-JWT (Json Web Token)은 
+### 1. Create User Model and Router
 
-1. Header
-2. Payload
+JWT은 두 파티가 안전하게 Data를 JSON Object로 주고 받을 수 있게 하기 위해 나온 보안방법이다. 우리는 JWT를 이용하여 이 서버에 회원가입 하고, 로그인하는 functionality를 구현할 것이다.
+
+JWT는 세 가지로 구성되어있다.
+
+1. Header: Algorithm + token type
+
+```
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+```
+
+2. Payload: Data
+
+우리는 Payload에 User Id를 담을 것이다.
+
+```
+{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "iat": 1516239022
+}
+```
+
 3. VERIFY SIGNATURE
 
+```
+HMACSHA256(
+  base64UrlEncode(header) + "." +
+  base64UrlEncode(payload),
+  your-256-bit-secret
+)
+```
 
+사용자의 name, email, password를 저장하는 user model 생성
+
+- `./models/userModel.js` file
+
+```
+import mongoose from "mongoose";
+
+const userSchema = mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Please add a name"],
+    },
+    email: {
+      type: String,
+      required: [true, "Please add an email"],
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Please add a password"],
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const User = mongoose.model("user", userSchema);
+export default User;
+```
+
+goal model에도 어떤 user의 goal인지를 알 수 있게 user를 추가한다.
+
+- `./models/goal.js` file
+
+```
+const goalSchema = mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
+    text: ...
+);
+```
+
+-`./app.js`
+
+```
+import userRoutes from "./routes/userRouters.js";
+app.use("/api/users", userRoutes);
+```
+
+3개의 action이 필요하다.
+
+1. register user
+2. login
+3. get the user information
+
+- `./routes/api/userRouters.js` file
+
+```
+import express from "express";
+import {
+  getMe,
+  loginUser,
+  registerUser,
+} from "../../controller/userController.js";
+
+const router = express.Router();
+
+router.post("/", registerUser);
+router.post("/login", loginUser);
+router.get("/me", getMe);
+
+export default router;
+
+```
+
+- `./controller/userController.js` file
+
+```
+/**
+ * @route POST api/users
+ * @desc Register new user
+ * @access Public
+ */
+export const registerUser = (req, res) => {
+  res.json({ message: "Register User" });
+};
+
+/**
+ * @route POST api/users/login
+ * @desc Authenticate a user
+ * @access Public
+ */
+export const loginUser = (req, res) => {
+  res.json({ message: "Login User" });
+};
+/**
+ * @route GET api/users/me
+ * @desc Get user data
+ * @access Private
+ */
+export const getMe = (req, res) => {
+  res.json({ message: "User data" });
+};
+```
+
+Postman에서 위의 http request가 잘 작동하는지 확인해 볼 수 있다.
+
+```
+- POST http://localhost:5000/api/users
+- POST http://localhost:5000/api/users/login
+- GET http://localhost:5000/api/users/me
+```
+
+### 2. Install dependencies for encrpyt
+
+We can't save plain user password into the database, we need to encrypt the password.
+
+- `bcryptjs`: encrypt password
+- `jsonwebtoken`: JWT
+
+> `npm i bcryptjs jsonwebtoken`
+
+- `./controller/userController.js` file
+
+```
+import jwt from "jsonwebtoken"
+import bcrypt from "bcryptjs"
+import User from "../models/userModel.js"
+
+export const registerUser = async (req, res, next) => {
+  try {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      res.status(400);
+      throw new Error("Please add all fields");
+    }
+
+    // Check if user exists
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      res.status(400);
+      throw new Error("User already exists");
+    }
+
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hasedPassword = await bcrypt.hash(password, salt);
+
+    // Create User
+    const user = await User.create({
+      name: name,
+      email: email,
+      password: hasedPassword,
+    });
+
+    if (user) {
+      res.status(201).json({
+        _id: user.id,
+        name: user.name,
+        email: user.email,
+      });
+    } else {
+      res.status(400);
+      throw new Error("Invalid user data");
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const loginUser = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    // Check for user email
+    const user = await User.findOne({ email });
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      res.status(201).json({
+        _id: user.id,
+        name: user.name,
+        email: user.email,
+      });
+    } else {
+      res.status(400);
+      throw new Error("Invalid credentials");
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+```
+
+Postman에서 위의 http request가 잘 작동하는지 확인해 볼 수 있다.
+
+```
+- POST http://localhost:5000/api/users
+Body: x-www-form-urlencoded {
+  key: name, value: Heechul Shin,
+  email: heeshin174@gmail.com,
+  password: 123456
+}
+or
+Headers: {key : Content-Type, value: application/json}
+Body: raw {
+    {
+    "name": "Heechul Shin",
+    "email": "heeshin174@gmail.com",
+    "password": 123456
+    }
+}
+
+- POST http://localhost:5000/api/users/login
+Same as above POST request
+```
+
+### 3. Generate JWT
+
+- `.env` file
+
+`JWT_SECRET = abc123`
+
+- `.controller/userController.js` file
+
+```
+// Generate JWT
+// User Id (payload)를 받아, jwt를 반환
+const generateToken = (id) => {
+ return jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: '30d',})
+}
+
+// 그리고, Signup 또는 login 하는 경우, token을 반환
+export const registerUser = async (req, res, next) => {
+    ...
+    if (user) {
+      res.status(201).json({
+        _id: user.id,
+        name: user.name,
+        email: user.email,
+        token: generateToken(user._id),
+      });
+    } ... };
+
+export const loginUser = async (req, res, next) => {
+    ...
+    if (user && (await bcrypt.compare(password, user.password))) {
+      res.status(201).json({
+        _id: user.id,
+        name: user.name,
+        email: user.email,
+        token: generateToken(user._id),
+      });
+    }
+    ... };
+```
+
+Postman에서 register나 login을 실행하면, 이제 다음과 같이, jwt token을 같이 얻을 수 있다. 이 token을 https://jwt.io/ 에 `Encoded`에 넣으면, 이 토큰에 맞는 유저 id를 얻을 수 있다.
+
+```
+{
+    "_id": "6205f5462a9154a700c507a3",
+    "name": "Heechul Shin",
+    "email": "heeshin174@gmail.com",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMDVmNTQ2MmE5MTU0YTcwMGM1MDdhMyIsImlhdCI6MTY0NDU1ODUxOSwiZXhwIjoxNjQ3MTUwNTE5fQ.D_fIMvhUUgQAekZq1Irih_7ajWR-V6edF4k9iL9Jkr0"
+}
+```
+
+### 4. Auth Middleware
+
+We will create a custom middleware. Middleware is a function that runs during the request and response cycle.
+Once we send a request to the router, middleware runs and check the token.
+
+- `./middleware/authMiddleware.js` file
+
+```
+import jwt from "jsonwebtoken";
+import User from "../models/userModel.js";
+
+export const protect = async (req, res, next) => {
+  try {
+    let token;
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer") // Bearer token
+    ) {
+      try {
+        // Get token from header (split[0] = "Bearer", split[1] = token)
+        token = req.headers.authorization.split(" ")[1];
+        // Verify token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Get user from the token
+        // Not include req.user.password (password is hashed)
+        req.user = await User.findById(decoded.id).select("-password");
+
+        // At the end of the middleware, we want to able to call next() piece of middleware.
+        next();
+      } catch (error) {
+        console.log(error.message);
+        res.status(401);
+        throw new Error("Not authorized");
+      }
+    }
+
+    if (!token) {
+      res.status(401);
+      throw new Error("Not authorized, no token");
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+```
+
+Once we send a GET request to the `api/users/me`, `protect` middleware runs and check the token.
+
+- `./routes/api/userRoutes.js` file
+
+```
+import { protect } from "../../middleware/authMiddleware.js";
+
+router.get("/me", protect, getMe);
+```
+
+Postman에서 login하면 주는 token을 가지고 auth Middleware가 잘 작동하는지 확인한다.
+
+```
+// token이 없이 getMe()에다 요청하면, error가 뜬다.
+GET http://localhost:5000/api/users/me
+{
+  "message": "Not authorized, no token",
+  "stack": "Error: Not authorized, no token\n
+}
+
+1. login with existing email and password
+POST http://localhost:5000/api/users/login
+Body => x-www-form-urlencoded
+{
+  key: email, value: heeshin174@gmail.com,
+  key: password, value: 123456
+}
+또는
+Headers => {Key: Content-Type, Value: application/json }
+{
+    "email": "heeshin174@gmail.com",
+    "password": 123456
+}
+
+It returns
+{
+    "_id": "6205f5462a9154a700c507a3",
+    "name": "Heechul Shin",
+    "email": "heeshin174@gmail.com",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMDVmNTQ2MmE5MTU0YTcwMGM1MDdhMyIsImlhdCI6MTY0NDU2OTQxNiwiZXhwIjoxNjQ3MTYxNDE2fQ.hAwM3ONRM40PDZBOrfPxT9V54gaAC78BNAVbkxS0l6Q"
+}
+
+위의 로그인 토큰을 가지고,
+GET http://localhost:5000/api/users/me
+Authorization => Bearer Token => Token에 login할 때 얻은 token 입력
+또는
+Headers => {Key: Authorization, Value: token입력 }
+
+It returns { "message": "User data" }, if token is correct.
+if token is incorrect, {"message": "Not authorized", "stack": "Error: Not authorized\n }
+```
+
+- `./controller/userController.js` file
+
+```
+export const getMe = async (req, res, next) => {
+  try {
+    const { _id, name, email } = await User.findById(req.user.id);
+    res.status(200).json({ id:_id, name:name, email:email });
+  } catch (err) {
+    next(err);
+  }
+};
+```
+
+### 5. Protect Goal Route
+
+지금은 GET `api/goals`하면, database에 있는 모든 goals를 보여준다. 우리는 특정 User와 연관된 goals만 보여주고 싶다.
+
+- `routes/api/goalRouters.js`
+
+```
+import { protect } from "../../middleware/authMiddleware.js";
+
+router.route("/").get(protect, getGoals).post(protect, setGoal);
+router.route("/:id").put(protect, updateGoal).delete(protect, deleteGoal);
+```
+
+- `./controller/goalController.js` file
+
+```
+export const getGoals = async (req, res, next) => {
+  try {
+    const goals = await Goal.find({ user: req.user.id });
+    res.status(200).json(goals);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const setGoal = async (req, res, next) => {
+  try {
+    if (!req.body.text) {
+      res.status(404);
+      throw new Error("Please add a text field");
+    }
+    const goal = await Goal.create({
+      text: req.body.text,
+      user: req.user.id,
+    });
+    res.status(201).json(goal);
+  } catch (err) {
+    next(err);
+  }
+};
+```
+
+Postman으로 Heechul Shin계정에 연결된 goals 보기
+
+```
+1. login후 특정 user의 token 얻기
+POST http://localhost:5000/api/users/login
+
+2. 특정 user의 goals 보기
+GET http://localhost:5000/api/goals
+Authorization => Bearer Token => User token입력
+
+3. 특정 user의 goals 추가
+POST http://localhost:5000/api/goals
+Authorization => Bearer Token => User token입력
+Body => x-www-urlencoded => { key: text, value: this is shin goal}
+
+It returns
+{
+    "user": "6205f5462a9154a700c507a3",
+    "text": "this is shin goal",
+    "_id": "62062bc456917a1862de86ac",
+    "createdAt": "2022-02-11T09:26:28.774Z",
+    "updatedAt": "2022-02-11T09:26:28.774Z",
+    "__v": 0
+}
+```
+
+![login-page](./img/postmanlogin.png)
+
+### 6. Update and Delete goals from specific User
+
+User가 다른 User의 goal를 수정 및 삭제 할 수 없도록 만든다.
+
+- `./controller/goalController.js` file
+
+```
+import User from "../models/userModel.js";
+
+export const updateGoal = async (req, res, next) => {
+  try {
+    const goal = await Goal.findById(req.params.id);
+
+    if (!goal) {
+      res.status(400);
+      throw new Error("Goal not found");
+    }
+
+    const user = await User.findById(req.user.id);
+
+    // Check for user
+    if (!user) {
+      res.status(401);
+      throw new Error("User not found");
+    }
+
+    // Make sure the logged in user matches the goal user
+    if (goal.user.toString() !== user.id) {
+      res.status(401);
+      throw new Error("User not authorized");
+    }
+
+    const updateGoal = await Goal.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    res.status(200).json(updateGoal);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteGoal = async (req, res, next) => {
+  try {
+    const goal = await Goal.findById(req.params.id);
+
+    if (!goal) {
+      res.status(400);
+      throw new Error("Goal not found");
+    }
+
+    // Check for user
+    if (!user) {
+      res.status(401);
+      throw new Error("User not found");
+    }
+
+    // Make sure the logged in user matches the goal user
+    if (goal.user.toString() !== user.id) {
+      res.status(401);
+      throw new Error("User not authorized");
+    }
+
+    await goal.remove();
+
+    res
+      .status(200)
+      .json({ id: req.params.id, message: `Delete goal ${req.params.id}` });
+  } catch (err) {
+    next(err);
+  }
+};
+```
+
+Postman으로 Heechul Shin계정에 연결된 goals 삭제
+
+```
+1. login후 특정 user의 token 얻기
+POST http://localhost:5000/api/users/login
+
+2. 특정 user의 goals 삭제
+DELETE http://localhost:5000/api/goals/<shingoalsid>
+Authorization => Bearer Token => User token입력
+
+모두가 볼수있는 goal: User에 대한 정보가 없다.
+
+{"_id":{"$oid":"620576f0a8685ddcf21dbb94"},
+"text":"updated goal",
+"createdAt":{"$date":{"$numberLong":"1644525296473"}},
+"updatedAt":{"$date":{"$numberLong":"1644525799402"}},
+"__v":{"$numberInt":"0"}}
+
+특정 User만 볼수있는 goal: User에 대한 정보도 포함한다.
+
+{"_id":{"$oid":"62062bc456917a1862de86ac"},
+"user":{"$oid":"6205f5462a9154a700c507a3"},
+"text":"this is shin goal",
+"createdAt":{"$date":{"$numberLong":"1644571588774"}},
+"updatedAt":{"$date":{"$numberLong":"1644571588774"}},
+"__v":{"$numberInt":"0"}}
+```
+
+- Commit git file (Fourth commit)
+
+```
+> $ git add .
+> $ git commit -m "Authentication and Authorization"
+```
 
 ## 4. Client: React
 
@@ -708,7 +1301,9 @@ client fodler에서 dependencies를 install한다.
 ## Reference
 
 - Youtube Link: https://www.youtube.com/watch?v=5yTazHkDR4o&list=PLillGF-RfqbbiTGgA77tGO426V3hRF9iE&index=3&ab_channel=TraversyMedia
+- Youtube Link2: https://www.youtube.com/watch?v=-0exw-9YJBo&list=RDCMUC29ju8bIPH5as8OGnQzwJyA&index=2
 - Github Link: https://github.com/bradtraversy/mern_shopping_list
 - Express JS: https://expressjs.com/
 - MongoDB docs: https://mongoosejs.com/docs/index.html
 - Mongoose docs: https://mongoosejs.com/docs/
+- JWT: https://jwt.io/
