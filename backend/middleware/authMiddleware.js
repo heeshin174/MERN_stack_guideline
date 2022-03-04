@@ -20,8 +20,8 @@ export const protect = async (req, res, next) => {
 
         // At the end of the middleware, we want to able to call next() piece of middleware.
         next();
-      } catch (error) {
-        console.log(error.message);
+      } catch (err) {
+        console.log(err.message);
         res.status(401);
         throw new Error("Not authorized");
       }

@@ -1,12 +1,12 @@
 {
-  "name": "mern_shopping_list",
+  "name": "mern_guideline",
   "version": "1.0.0",
-  "description": "Shopping List built with the MERN stack",
-  "main": "server.js",
+  "description": "Goal setter built with the MERN stack",
+  "main": "backend/server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "server": "nodemon server.js",
+    "start": "node backend/server.js",
+    "server": "nodemon backend/server.js",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "client-install": "npm install --prefix client"

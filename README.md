@@ -1,62 +1,68 @@
-# MERN Tutorial
+# MERN GUIDELINE
 
 Learn the MERN Stack
 
 - M: MongoDB (Database)
-- E: Express Js (Server)
-- R: React Js (Frontend)
-- N: Node Js
+- E: Express.js (Server)
+- R: React.js (Frontend)
+- N: Node.js
+
+만약 Window Subsystem for Linux (WSL)에서 코드를 작업 중이라면 `$ wsl hostname -I`를 Window terminal에 입력 후, localhost를 결과값으로 변경한다.
+즉 localhost로 연결되지 않는 경우, 코드를 local computer가 아닌 다른 곳에 작성 했다는 의미이고, localhost를 그에 맞게 변경한다.
+
+- `$ wsl hostname -I`의 값은 상시 변하므로, local computer에서 RESTAPI test시 계속 변경해 주어야 한다.
+
+```
+Window: GET http://localhost:5000/api/users/me
+WSL: GET http://172.29.69.223:5000/api/users/me
+```
 
 ## Used Technologies
 
-- Node js [node.js](https://nodejs.org/en/)
-- Postman [Postman](https://www.postman.com/downloads/)
-- VSCode [VSCode](https://code.visualstudio.com/)
-- github [github](https://github.com/)
-- Heroku [Heroku](https://www.heroku.com/)
-- mongoDB
-- React js
-- Redux-toolkit
-- Express js
+- Node.js
+- Database: mongoDB
+- Frontend: React.js && Next.js && Redux-toolkit
+- Backend: Express.js
+- Postman
+- VSCode
+- github
+- Heroku
 
 ## Beginning from scratch
 
 Workflow: 1. Server => 2. Database => 3. User authentication => 4. Frontend
 
-## 1. Server: Express js
+## 1. Server: Express
 
 ### 1. Initialize project
 
 Open Terminal and type the following command:
 
 ```
-> $ mkdir MERN_SHOPPING_LIST
-> $ cd MERN_SHOPPING_LIST
-> $ npm init
+$ mkdir MERN_SHOPPING_LIST
+$ cd MERN_SHOPPING_LIST
+$ npm init
 ```
 
-- description: Shopping List built with the MERN stack
+- description: Goal setter built with the MERN stack
 - entry point (index.js) server.js
 - type: "module"
-- author: Heechul Shin
+- author: `Heechul Shin <heeshin174@gmail.com>`
 - license: (ISC) MIT
 
-type을 module로 해야지만 file을 내보내고/가져올 때, `module.export/require`을 사용하는 CommonJS 대신
-`import/export`의 형식을 지원하는 ES6 module을 사용할 수 있습니다.
+type을 module로 해야지만 file을 내보내고/가져올 때, `module.export/require`을 사용하는 CommonJS 대신 `import/export`의 형식을 지원하는 ES6 module을 사용할 수 있습니다.
 
 ### 2. Install Dependencies for Backend and Database:
 
-- `express`: Backend framework:
+- `express`: Backend framework
 - `mongoose`: mongodb framework
-- `concurrently`: run more than one `npm` scripts at a time, so that we are able to run the server and the client at a same time.
 - `nodemon`: constantly watch our backend and reload once we save (auto refresh).
 - `dotenv`: set the environment variable so that hide all of our secret information.
 - `colors`: get color and style
 
-```
-body-parser: POST 요청시 body 데이터값을 읽을 수 있는 구문으로 parsing해줍니다. Object => Json
-💥 Express v4.16.0 기준으로 body parser가 built-in 되어 별도의 설치 없이 아래와 같이 이용 가능합니다!
+`body-parser` library: POST 요청시 body 데이터값을 읽을 수 있는 구문으로 parsing한다 (Object => Json). Express v4.16.0 기준으로 body-parser가 built-in 되어 별도의 설치 없이 아래와 같이 이용가능하다.
 
+```
 const express = require('express');
 const app = express();
 
@@ -64,17 +70,18 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded( {extended : false } ));
 
-bodyparser middleware를 사용하지 않으면, post request를 헀을 때 res.body가 undefined이 된다.
+// bodyparser middleware를 사용하지 않으면, post request를 헀을 때 res.body가 undefined이 된다.
 
 app.post('/api/goals', (req, res) => {
+    // before adding bodyparser
     console.log(req.body); // undefined
-})
 
-// after add `app.use(express.json())`
-console.log(req.body); // [Object: null prototype] { key: 'value' }
+    // after adding bodyparser
+    console.log(req.body); // [Object: null prototype] { key: 'value' }
+})
 ```
 
-> `npm i express mongoose concurrently dotenv colors`
+> `npm i express mongoose dotenv colors`
 
 nodemon은 개발할 때만 사용할 dependency이기 때문에, -D를 붙혀 실제 production에서는 설치하지 않는다.
 
@@ -90,8 +97,8 @@ nodemon은 개발할 때만 사용할 dependency이기 때문에, -D를 붙혀 �
 
 ```
 "scripts": {
-  "start": "node server.js",
-  "server": "nodemon server.js"
+  "start": "node backend/server.js",
+  "server": "nodemon backend/server.js"
 },
 ```
 
@@ -102,20 +109,20 @@ To use these command, type:
 
 > `npm start`
 
-run the command that is defined in "start" script. This is same as `node server.js`
+run the command that is defined in "start" script. This is same as `cd backend; node server.js`
 
 > `npm run server`
 
-- Create `.env`, `server.js`, `app.js`
+- Create `.env` and `backend` directory
 
-`.env` file
+`./.env` file
 
 ```
 NODE_ENV = development
 PORT = 5000
 ```
 
-`./server.js` file
+`./backend/server.js` file
 
 ```
 import app from "./app.js";
@@ -124,7 +131,7 @@ const PORT = process.env.PORT || 5000
 app.listen(PORT, () => console.log(`Server started on PORT ${PORT}`));
 ```
 
-`./app.js` file
+`./backend/app.js` file
 
 ```
 import express from "express";
@@ -150,15 +157,15 @@ export default app;
 
 we put our environment variables in the `.env` file, so, we don't want `.env` to deploy.
 
-- Add `.env`, `node_modules` and `package-lock.json` to `.gitignore`.
+- Add `.env`, `node_modules` to `.gitignore`.
 
 ### 4. Routes file
 
 When clients send http request to `/api/goals`, server need to response. We don't want `app.js` file handle all requests.
 
-- Create `./routes/api/goalRoutes.js` folders and file to handle routing.
+- Create `./backend/routes/api/goalRoutes.js` folders and file to handle routing.
 
-`./routes/api/goalRoutes.js` file
+`./backend/routes/api/goalRoutes.js` file
 
 ```
 import express from "express";
@@ -200,7 +207,7 @@ router.delete("/:id", (req, res) => {
 export default router;
 ```
 
-`./app.js` file
+`./backend/app.js` file
 
 ```
 import goalRoutes from "./routes/api/goalRouters.js";
@@ -213,11 +220,9 @@ now, run the server and open Postman and send http request to `localhost:5000/ap
 
 ### 5. Controller
 
-It is better to have a controller that contains all functions for `/api/goals`.
+It is better to have a controller that contains all functions for `/api/goals` that handle http requests.
 
-- Create `controllers/goalController.js` folder and file to handle http requests.
-
-`./controllers/goalController.js` file
+`./backend/controllers/goalController.js` file
 
 ```
 /**
@@ -273,7 +278,7 @@ export const deleteGoal = (req, res) => {
 };
 ```
 
-`./routes/goalRoutes.js` file
+`./backend/routes/goalRoutes.js` file
 
 ```
 import {
@@ -298,7 +303,7 @@ router.route('/:id').put(updateGoal).delete(deleteGoal)
 
 We will use default built in error handler provided by Express js `throw new Error("message")`
 
-`./controller/goalController.js` file
+`./backend/controller/goalController.js` file
 
 ```
 // If there is nothing in the request body, then throw an error with status 404.
@@ -315,9 +320,9 @@ export const getGoals = (req, res, next) => {
 };
 ```
 
-위의 코드는 text가 없는 post request를 했을 경우, by default, express js error handler returns html page. We want to get the json file, so we will override default error message.
+위의 코드는 text가 없는 post request를 했을 경우, by default, express js error handler returns 404 error html page. We want to get the json file, so we will override default error message.
 
-`./middleware/errorMiddleware.js` folder와 file 생성
+`./backend/middleware/errorMiddleware.js` file
 
 ```
 // stack trace gives up some additional information (ex. line number), but I only want that if we're in development mode.
@@ -357,9 +362,9 @@ Now if we post empty object, we get json object with the message and then also g
 We need a MongoDB URL to be able to connect to.
 
 - Go to Mongodb website (Mongodb Atlas) and create database
-- Mongodb Atlas: cloud baesd
-- Mongodb compass: Database GUI
-- MongoDB URL (MongoDB Atlas): https://www.mongodb.com/cloud/atlas/lp/try2?utm_content=1217adtest_pmcopy_control&utm_source=google&utm_campaign=gs_americas_united_states_search_core_brand_atlas_desktop&utm_term=mongodb%20atlas&utm_medium=cpc_paid_search&utm_ad=e&utm_ad_campaign_id=12212624338&adgroup=115749704063&gclid=Cj0KCQiAxc6PBhCEARIsAH8Hff0GkAMWkv-SOoaFSdMgxQaEshcIGIyDHAaSqp-B-yPgW03BbW9DxxQaAhi8EALw_wcB
+  - Mongodb Atlas: cloud baesd
+  - Mongodb compass: Database GUI
+  - MongoDB URL (MongoDB Atlas): https://www.mongodb.com/
 
 ```
 Create Project => Create Database => Cluster Tier: M0 Sandbox (Free) => Cloud Provider: AWS
@@ -375,7 +380,7 @@ Set User name & User password => Network access IP Address
 
 - Using this MongoDB URI, connect to the Database in `config/db.js`
 
-- `./config/db.js`
+- `./backend/config/db.js`
 
 ```
 import mongoose from "mongoose";
@@ -570,7 +575,7 @@ HMACSHA256(
 
 사용자의 name, email, password를 저장하는 user model 생성
 
-- `./models/userModel.js` file
+- `./backend/models/userModel.js` file
 
 ```
 import mongoose from "mongoose";
@@ -600,12 +605,12 @@ const User = mongoose.model("user", userSchema);
 export default User;
 ```
 
-goal model에도 어떤 user의 goal인지를 알 수 있게 user를 추가한다.
+goalModel에도 어떤 user의 goal인지를 알 수 있게 user를 추가한다.
 
-- `./models/goal.js` file
+- `./backend/models/goalModel.js` file
 
 ```
-const goalSchema = mongoose.Schema(
+const goalSchema = mongoose.Schema (
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -613,10 +618,11 @@ const goalSchema = mongoose.Schema(
       ref: "User",
     },
     text: ...
+  }
 );
 ```
 
--`./app.js`
+- `./backend/app.js`
 
 ```
 import userRoutes from "./routes/userRouters.js";
@@ -629,7 +635,7 @@ app.use("/api/users", userRoutes);
 2. login
 3. get the user information
 
-- `./routes/api/userRouters.js` file
+- `./backend/routes/api/userRouters.js` file
 
 ```
 import express from "express";
@@ -649,7 +655,7 @@ export default router;
 
 ```
 
-- `./controller/userController.js` file
+- `./backend/controller/userController.js` file
 
 ```
 /**
@@ -696,7 +702,7 @@ We can't save plain user password into the database, we need to encrypt the pass
 
 > `npm i bcryptjs jsonwebtoken`
 
-- `./controller/userController.js` file
+- `./backend/controller/userController.js` file
 
 ```
 import jwt from "jsonwebtoken"
@@ -792,11 +798,9 @@ Same as above POST request
 
 ### 3. Generate JWT
 
-- `.env` file
+- add `JWT_SECRET = abc123` to `.env` file
 
-`JWT_SECRET = abc123`
-
-- `.controller/userController.js` file
+- `./backend/controller/userController.js` file
 
 ```
 // Generate JWT
@@ -957,7 +961,7 @@ export const getMe = async (req, res, next) => {
 
 지금은 GET `api/goals`하면, database에 있는 모든 goals를 보여준다. 우리는 특정 User와 연관된 goals만 보여주고 싶다.
 
-- `routes/api/goalRouters.js`
+- `./backend/routes/api/goalRouters.js`
 
 ```
 import { protect } from "../../middleware/authMiddleware.js";
@@ -1124,6 +1128,12 @@ Authorization => Bearer Token => User token입력
 "__v":{"$numberInt":"0"}}
 ```
 
+![goaldb](img/goaldb.png)
+
+![userdb](img/userdb.png)
+
+![deletegoaldb](img/deletegoaldb.png)
+
 - Commit git file (Fourth commit)
 
 ```
@@ -1131,25 +1141,26 @@ Authorization => Bearer Token => User token입력
 > $ git commit -m "Authentication and Authorization"
 ```
 
-## 4. Client: React
+## 4. Client: React && Next
 
 ### 1. Create client folder
 
 - create new folder 'client'
+- Inside the client folder, create new react app with redux-toolkit
 
-> `mkdir client; cd client`
+> `npx create-react-app client --template redux`
 
-inside the client folder, create new react app
+또는,
 
-> `npx create-react-app .`
+> `npm install @reduxjs/toolkit`
 
-create-react-app은 기존의 package.json과는 다른 새로운 package.json을 만들어 내는데, 이 package.json에 "proxy" value를 적어놓는 것이 중요하다. proxy는 개발할 때만 쓰이기 때문에 나중에는 신경쓰지 않아도 된다.
+create-react-app은 기존의 package.json과는 다른 새로운 package.json을 만들어 내는데, 새로운 package.json에 "proxy" value를 적어놓는 것이 중요하다. proxy는 개발할 때만 쓰이기 때문에 나중에는 신경쓰지 않아도 된다.
 
-예를 들어 `axios.get('http://localhost:5000/api/items')`와 같은 긴 주소명을
-`axios.get('api/items')`와 같이 짧게 쓰는 것을 가능하게 만들어 준다.
+예를 들어 `axios.get('http://localhost:5000/api/items')`와 같은 긴 주소명을 `axios.get('api/items')`와 같이 짧게 쓰는 것을 가능하게 만들어 준다.
+
+- package.json in client folder
 
 ```
-// package.json in client folder
 {
   "name": "client",
   "version": "0.1.0",
@@ -1171,16 +1182,14 @@ create-react-app은 기존의 package.json과는 다른 새로운 package.json�
 }
 ```
 
-우리는 두 개의 package.json이 있기 때문에 client folder에서 `npm start`를 입력하면 react가 실행되고,
-MERN_SHOPPING_LIST folder에서 `npm start`를 입력하면 server.js가 실행된다.
+우리는 두 개의 `package.json`이 있기 때문에 `client` folder에서 `npm start`를 입력하면 react가 실행되고,
+서버가 있는 folder에서 `npm start`를 입력하면 server.js가 실행된다.
 
 우리는 이런 두 개의 command를 MERN_SHOPPING_LIST folder에서 동시에 사용하고 싶다.
 
 이때, 우리가 설치한 dependency `concurrently`가 역할을 해준다.
 
-- MERN_SHOPPING_LIST folder의 package.json에 "client": "cd client && npm start" 또는 "client": "npm start --prefix client"를 적는다.
-
-  이는 사용자가 client folder를 들어가지 않고도 client folder의 react app을 실행시킨다.
+- MERN_SHOPPING_LIST folder의 package.json에 `"client": "cd client && npm start"` 또는 `"client": "npm start --prefix client"`를 적는다. 이는 사용자가 client folder를 들어가지 않고도 client folder의 react app을 실행시킨다.
 
 Run the React client only
 
@@ -1197,6 +1206,8 @@ Install dependencies for client
 server side의 dependencies를 설치하려면, MERN_SHOPPING_LIST folder에서 다음을 입력한다.
 
 > `npm install`
+
+- `concurrently`: run more than one `npm` scripts at a time, so that we are able to run the server and the client at a same time.
 
 concurrently 사용법:
 
@@ -1239,7 +1250,7 @@ Server runs on http://localhost:5000 and client on http://localhost:3000
 }
 ```
 
-### 7. Install dependencies for client
+### 2. Install dependencies for client
 
 Go to the client folder and install dependencies.
 
@@ -1247,21 +1258,11 @@ Go to the client folder and install dependencies.
 
 - `bootstrap`: frontend dev에 대한 구조를 미리 만들어둔 프레임워크입니다. 기본적인 css, js를 제공합니다.
 - `reactstrap`: bootstrap component를 react component로 사용할 수 있게 만들어 준다.
-
-`reactstrap`은 `material-ui`처럼 다른 프로그래머가 미리 만들어둔 react component를 가져다 쓸 수 있기 떄문에 매우 편하다.
-
-이처럼 다른 사람이 만들어둔 source code를 찾아 copy & paste만 잘해도 된다.
-
-- `uuid`: generate random ID
 - `react-transition-group`: exposes simple components useful for defining entering and exiting transitions.
 
-> `npm i bootstrap reactstrap uuid react-transition-group`
+> `npm i bootstrap reactstrap react-transition-group`
 
-### 8. src folder에 component folder를 만들기
-
-react js는 js 대신 jsx라는 다른 extension을 사용한다. 하지만 js를 사용해도 아무런 문제는 없다.
-
-AppNavbar.js === AppNavbar.jsx
+### 3. src folder에 component folder를 만들기
 
 - src folder에 component folder를 만든다.
 - component folder에 AppNavbar.js를 만든다.
@@ -1293,7 +1294,7 @@ client fodler에서 dependencies를 install한다.
 - `react-redux`:
 - `redux-thunk`:
 
-> `npm i redux react-redux redux-thunk`
+> `npm i redux react-redux redux-thunk` > `npm i -D redux react-redux redux-thunk`
 
 - client/src에 store.js 만들기
 - App.js에 Provider 추가
@@ -1301,9 +1302,4 @@ client fodler에서 dependencies를 install한다.
 ## Reference
 
 - Youtube Link: https://www.youtube.com/watch?v=5yTazHkDR4o&list=PLillGF-RfqbbiTGgA77tGO426V3hRF9iE&index=3&ab_channel=TraversyMedia
-- Youtube Link2: https://www.youtube.com/watch?v=-0exw-9YJBo&list=RDCMUC29ju8bIPH5as8OGnQzwJyA&index=2
 - Github Link: https://github.com/bradtraversy/mern_shopping_list
-- Express JS: https://expressjs.com/
-- MongoDB docs: https://mongoosejs.com/docs/index.html
-- Mongoose docs: https://mongoosejs.com/docs/
-- JWT: https://jwt.io/

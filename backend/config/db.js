@@ -3,14 +3,14 @@ import mongoose from "mongoose";
 // Connect to Mongo
 // mongoose.connect returns Promise object
 // version1. using async/awiat
-const connectDB = async () => {
+export const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
 
-    // .cyan.underline is from colors package
+    // .cyan.underline is from `colors` package
     console.log(`MongoDB Connected: ${conn.connection.host}`.cyan.underline);
   } catch (err) {
     console.log(err.message);
@@ -26,5 +26,3 @@ const connectDB = async () => {
 //   })
 //   .then(() => console.log("MongoDB Connected..."))
 //   .catch((err) => console.log(err.massage));
-
-export default connectDB;

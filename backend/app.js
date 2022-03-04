@@ -3,10 +3,11 @@ import itemRoutes from "./routes/api/itemRouters.js";
 import goalRoutes from "./routes/api/goalRouters.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
 import colors from "colors";
-import connectDB from "./config/db.js";
+import { connectDB } from "./config/db.js";
 import dotenv from "dotenv";
 import userRoutes from "./routes/api/userRouters.js";
 
+// get .env file variables
 dotenv.config();
 connectDB();
 

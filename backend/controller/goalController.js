@@ -1,4 +1,4 @@
-import Goal from "../models/goal.js";
+import Goal from "../models/goalModel.js";
 import User from "../models/userModel.js";
 
 /**
@@ -67,6 +67,7 @@ export const updateGoal = async (req, res, next) => {
     const updateGoal = await Goal.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
+
     res.status(200).json(updateGoal);
   } catch (err) {
     next(err);
@@ -88,13 +89,13 @@ export const deleteGoal = async (req, res, next) => {
     }
 
     // Check for user
-    if (!user) {
+    if (!req.user) {
       res.status(401);
       throw new Error("User not found");
     }
 
     // Make sure the logged in user matches the goal user
-    if (goal.user.toString() !== user.id) {
+    if (goal.user.toString() !== req.user.id) {
       res.status(401);
       throw new Error("User not authorized");
     }
