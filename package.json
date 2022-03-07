@@ -20,7 +20,7 @@
   "bugs": {
     "url": "https://github.com/heeshin174/MERN_Shopping_List/issues"
   },
-  "homepage": "https://github.com/heeshin174/MERN_Shopping_List#readme",
+  "homepage": "https://github.com/heeshin174/MERN_guideline#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "colors": "^1.4.0",

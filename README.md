@@ -10,6 +10,7 @@ Learn the MERN Stack
 만약 Window Subsystem for Linux (WSL)에서 코드를 작업 중이라면 `$ wsl hostname -I`를 Window terminal에 입력 후, localhost를 결과값으로 변경한다.
 즉 localhost로 연결되지 않는 경우, 코드를 local computer가 아닌 다른 곳에 작성 했다는 의미이고, localhost를 그에 맞게 변경한다.
 
+- To close server, type `Ctrl + C`
 - `$ wsl hostname -I`의 값은 상시 변하므로, local computer에서 RESTAPI test시 계속 변경해 주어야 한다.
 
 ```
@@ -39,13 +40,13 @@ Workflow: 1. Server => 2. Database => 3. User authentication => 4. Frontend
 Open Terminal and type the following command:
 
 ```
-$ mkdir MERN_SHOPPING_LIST
-$ cd MERN_SHOPPING_LIST
+$ mkdir MERN_guideline
+$ cd MERN_guideline
 $ npm init
 ```
 
 - description: Goal setter built with the MERN stack
-- entry point (index.js) server.js
+- entry point (index.js) backend/server.js
 - type: "module"
 - author: `Heechul Shin <heeshin174@gmail.com>`
 - license: (ISC) MIT
@@ -60,7 +61,7 @@ type을 module로 해야지만 file을 내보내고/가져올 때, `module.expor
 - `dotenv`: set the environment variable so that hide all of our secret information.
 - `colors`: get color and style
 
-`body-parser` library: POST 요청시 body 데이터값을 읽을 수 있는 구문으로 parsing한다 (Object => Json). Express v4.16.0 기준으로 body-parser가 built-in 되어 별도의 설치 없이 아래와 같이 이용가능하다.
+- `body-parser` library: POST 요청시 body 데이터값을 읽을 수 있는 구문으로 parsing한다 (Object => Json). Express v4.16.0 기준으로 body-parser가 built-in 되어 별도의 설치 없이 아래와 같이 이용가능하다.
 
 ```
 const express = require('express');
@@ -115,7 +116,7 @@ run the command that is defined in "start" script. This is same as `cd backend; 
 
 - Create `.env` and `backend` directory
 
-`./.env` file
+- `./.env` file
 
 ```
 NODE_ENV = development
@@ -147,25 +148,26 @@ app.use(express.urlencoded({ extended: false }));
 export default app;
 ```
 
-- Initialize and Commit git file (first commit)
+- Initialize and commit git file (first commit)
+- github에 new repository 생성 후, 현재 project와 연결하기
 
 ```
-> $ git init
-> $ git add .
-> $ git commit -m "Initial Project"
+$ git init
+$ git remote add https://...
+$ git remote add origin
+$ git add .
+$ git commit -m "Initial Project"
 ```
 
-we put our environment variables in the `.env` file, so, we don't want `.env` to deploy.
+we put our environment variables, such as API keys, in the `.env` file, so, we don't want `.env` to deploy.
 
-- Add `.env`, `node_modules` to `.gitignore`.
+- Add `.env`, `node_modules`, `vscode` to `.gitignore`.
 
 ### 4. Routes file
 
 When clients send http request to `/api/goals`, server need to response. We don't want `app.js` file handle all requests.
 
-- Create `./backend/routes/api/goalRoutes.js` folders and file to handle routing.
-
-`./backend/routes/api/goalRoutes.js` file
+- `./backend/routes/api/goalRoutes.js` file to handle routing
 
 ```
 import express from "express";
@@ -207,7 +209,7 @@ router.delete("/:id", (req, res) => {
 export default router;
 ```
 
-`./backend/app.js` file
+- `./backend/app.js` file
 
 ```
 import goalRoutes from "./routes/api/goalRouters.js";
@@ -222,7 +224,7 @@ now, run the server and open Postman and send http request to `localhost:5000/ap
 
 It is better to have a controller that contains all functions for `/api/goals` that handle http requests.
 
-`./backend/controllers/goalController.js` file
+- `./backend/controllers/goalController.js` file
 
 ```
 /**
@@ -299,11 +301,11 @@ router.route('/:id').put(updateGoal).delete(deleteGoal)
 
 ### 6. Error and Exception handling
 
-현재 server에 `api/goals`에 post request를 할 때, text를 아무것도 안적어도 status 200으로 성공했다는 message가 뜬다. 이는 error handling을 하지 않았기 떄문이다. 사용자가 req.body에 아무것도 입력하지 않았을 경우, status 400으로 실패했다는 message가 뜨게 만든다.
+현재 server에 `api/goals`에 post request를 할 때, text를 아무것도 안적어도 status 200으로 성공했다는 message가 뜬다. 이는 error handling을 하지 않았기 떄문이다. 사용자가 `req.body`에 아무것도 입력하지 않았을 경우, status 400으로 실패했다는 message가 뜨게 만든다.
 
-We will use default built in error handler provided by Express js `throw new Error("message")`
+We will use default built in error handler provided by Express.js `throw new Error("message")`
 
-`./backend/controller/goalController.js` file
+- `./backend/controller/goalController.js` file
 
 ```
 // If there is nothing in the request body, then throw an error with status 404.
@@ -322,7 +324,7 @@ export const getGoals = (req, res, next) => {
 
 위의 코드는 text가 없는 post request를 했을 경우, by default, express js error handler returns 404 error html page. We want to get the json file, so we will override default error message.
 
-`./backend/middleware/errorMiddleware.js` file
+- `./backend/middleware/errorMiddleware.js` file
 
 ```
 // stack trace gives up some additional information (ex. line number), but I only want that if we're in development mode.
@@ -337,7 +339,7 @@ export const errorHandler = (err, req, res, next) => {
 };
 ```
 
-`./app.js` file
+- `./backend/app.js` file
 
 ```
 import { errorHandler } from "./middleware/errorMiddleware.js";
@@ -351,8 +353,8 @@ Now if we post empty object, we get json object with the message and then also g
 - Commit git file (second commit)
 
 ```
-> $ git add .
-> $ git commit -m "Goals controller and routes setup"
+$ git add .
+$ git commit -m "Goals controller and routes setup"
 ```
 
 ## 2. Database: MongoDB
@@ -405,7 +407,7 @@ const connectDB = async () => {
 export default connectDB;
 ```
 
-- `app.js`
+- `./backend/app.js`
 
 ```
 import colors from "colors";
@@ -417,10 +419,9 @@ connectDB();
 ### 2. Create Database schemas/models
 
 - Define a database schemas in the seperate folder class models
-- In models folder, define `goal.js` that returns Goal table
-- create `./models/goal.js` folder and file
+- In models folder, define `goalModel.js` that returns Goal table
 
-- `./models/goal.js`
+- `./backend/models/goalModel.js`
 
 ```
 import mongoose from "mongoose";
@@ -441,10 +442,10 @@ const goalSchema = mongoose.Schema(
 export default mongoose.model("Goal", goalSchema);
 ```
 
-- `./controller/goalController.js`
+- `./backend/controller/goalController.js`
 
 ```
-import Goal from "../models/goal.js";
+import Goal from "../models/goalModel.js";
 
 // GET Goal : 모든 goals 받기
 export const getGoals = async (req, res) => {
@@ -530,15 +531,15 @@ Same as POST request
 - Commit git file (third commit)
 
 ```
-> $ git add .
-> $ git commit -m "Initial REST API for goals"
+$ git add .
+$ git commit -m "Initial REST API for goals"
 ```
 
 ## 3. JWT Authentication (Signup and Login)
 
 ### 1. Create User Model and Router
 
-JWT은 두 파티가 안전하게 Data를 JSON Object로 주고 받을 수 있게 하기 위해 나온 보안방법이다. 우리는 JWT를 이용하여 이 서버에 회원가입 하고, 로그인하는 functionality를 구현할 것이다.
+JWT은 두 entities가 안전하게 Data를 JSON Object로 주고 받을 수 있게 하기 위해 나온 보안방법이다. 우리는 JWT를 이용하여 이 서버에 회원가입 하고, 로그인하는 functionality를 구현할 것이다.
 
 JWT는 세 가지로 구성되어있다.
 
@@ -629,7 +630,7 @@ import userRoutes from "./routes/userRouters.js";
 app.use("/api/users", userRoutes);
 ```
 
-3개의 action이 필요하다.
+user에 대해 3개의 action이 필요하다.
 
 1. register user
 2. login
@@ -652,7 +653,6 @@ router.post("/login", loginUser);
 router.get("/me", getMe);
 
 export default router;
-
 ```
 
 - `./backend/controller/userController.js` file
@@ -693,12 +693,12 @@ Postman에서 위의 http request가 잘 작동하는지 확인해 볼 수 있�
 - GET http://localhost:5000/api/users/me
 ```
 
-### 2. Install dependencies for encrpyt
+### 2. Install dependencies for encrpyting password
 
 We can't save plain user password into the database, we need to encrypt the password.
 
 - `bcryptjs`: encrypt password
-- `jsonwebtoken`: JWT
+- `jsonwebtoken`: Json Web Token
 
 > `npm i bcryptjs jsonwebtoken`
 
@@ -944,7 +944,7 @@ It returns { "message": "User data" }, if token is correct.
 if token is incorrect, {"message": "Not authorized", "stack": "Error: Not authorized\n }
 ```
 
-- `./controller/userController.js` file
+- `./backend/controller/userController.js` file
 
 ```
 export const getMe = async (req, res, next) => {
@@ -999,7 +999,7 @@ export const setGoal = async (req, res, next) => {
 };
 ```
 
-Postman으로 Heechul Shin계정에 연결된 goals 보기
+Postman으로 특정 user계정에 연결된 goals 보기
 
 ```
 1. login후 특정 user의 token 얻기
@@ -1031,7 +1031,7 @@ It returns
 
 User가 다른 User의 goal를 수정 및 삭제 할 수 없도록 만든다.
 
-- `./controller/goalController.js` file
+- `./backend/controller/goalController.js` file
 
 ```
 import User from "../models/userModel.js";
@@ -1078,13 +1078,13 @@ export const deleteGoal = async (req, res, next) => {
     }
 
     // Check for user
-    if (!user) {
+    if (!req.user) {
       res.status(401);
       throw new Error("User not found");
     }
 
     // Make sure the logged in user matches the goal user
-    if (goal.user.toString() !== user.id) {
+    if (goal.user.toString() !== req.user.id) {
       res.status(401);
       throw new Error("User not authorized");
     }
@@ -1100,7 +1100,7 @@ export const deleteGoal = async (req, res, next) => {
 };
 ```
 
-Postman으로 Heechul Shin계정에 연결된 goals 삭제
+Postman으로 특정 user계정에 연결된 goals 삭제
 
 ```
 1. login후 특정 user의 token 얻기
@@ -1137,111 +1137,72 @@ Authorization => Bearer Token => User token입력
 - Commit git file (Fourth commit)
 
 ```
-> $ git add .
-> $ git commit -m "Authentication and Authorization"
+$ git add .
+$ git commit -m "Authentication and Authorization"
 ```
 
-## 4. Client: React && Next
+## 4. Client: React && Next && Redux-toolkit
 
 ### 1. Create client folder
 
-- create new folder 'client'
-- Inside the client folder, create new react app with redux-toolkit
+- create new directory 'client' and create new react app with next.js + typescript
 
-> `npx create-react-app client --template redux`
+```
+$ npx create-next-app@latest --typescript
+// 또는
+$ npx create-next-app@latest --ts
+```
 
-또는,
-
-> `npm install @reduxjs/toolkit`
-
-create-react-app은 기존의 package.json과는 다른 새로운 package.json을 만들어 내는데, 새로운 package.json에 "proxy" value를 적어놓는 것이 중요하다. proxy는 개발할 때만 쓰이기 때문에 나중에는 신경쓰지 않아도 된다.
+create-react-app은 기존의 backend에서 쓰는 `package.json`과는 다른 새로운 `package.json`을 만들어 내는데, client의 package.json에 "proxy" value를 적어놓는 것이 중요하다. proxy는 개발할 때만 쓰이기 때문에 나중에는 신경쓰지 않아도 된다.
 
 예를 들어 `axios.get('http://localhost:5000/api/items')`와 같은 긴 주소명을 `axios.get('api/items')`와 같이 짧게 쓰는 것을 가능하게 만들어 준다.
 
-- package.json in client folder
+- `./client/package.json` file
 
 ```
 {
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  ...
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "12.1.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "17.0.21",
+    "@types/react": "17.0.39",
+    "eslint": "8.10.0",
+    "eslint-config-next": "12.1.0",
+    "typescript": "4.6.2"
   },
   "proxy": "http://localhost:5000/"
 }
 ```
 
-우리는 두 개의 `package.json`이 있기 때문에 `client` folder에서 `npm start`를 입력하면 react가 실행되고,
-서버가 있는 folder에서 `npm start`를 입력하면 server.js가 실행된다.
-
-우리는 이런 두 개의 command를 MERN_SHOPPING_LIST folder에서 동시에 사용하고 싶다.
-
-이때, 우리가 설치한 dependency `concurrently`가 역할을 해준다.
-
-- MERN_SHOPPING_LIST folder의 package.json에 `"client": "cd client && npm start"` 또는 `"client": "npm start --prefix client"`를 적는다. 이는 사용자가 client folder를 들어가지 않고도 client folder의 react app을 실행시킨다.
-
-Run the React client only
-
-> `npm run client`
-
-- MERN_SHOPPING_LIST folder의 package.json에 "client": "client-install": "npm install --prefix client" 또는 "client": "cd client && npm install"를 적는다.
-
-  이는 사용자가 client folder를 들어가지 않고도 client folder의 dependencies를 install할 수 있게 해준다.
-
-Install dependencies for client
-
-> `npm run client-install`
-
-server side의 dependencies를 설치하려면, MERN_SHOPPING_LIST folder에서 다음을 입력한다.
-
-> `npm install`
+우리는 두 개의 `package.json`이 있기 때문에 `client` folder내에서 `npm start`를 입력하면 react가 실행되고, root directory에서 `npm start`를 입력하면 `./backend/server.js`가 실행된다. 이 두 개의 command를 root에서 동시에 사용하기 위해 `concurrently` dependency를 설치한다.
 
 - `concurrently`: run more than one `npm` scripts at a time, so that we are able to run the server and the client at a same time.
+- root directory에서 `$ npm i -D concurrently`
 
-concurrently 사용법:
-
-Remember to surround separate commands with quotes:
-
-> `concurrently "command1 arg" "command2 arg"`
-
-Otherwise concurrently would try to run 4 separate commands: command1, arg, command2, arg.
-
-In package.json, escape quotes:
-
-> `"start": "concurrently \"command1 arg\" \"command2 arg\""`
-
-- MERN_SHOPPING_LIST folder의 package.json에 "dev": "concurrently \"npm run server\" \"npm run client\""를 적는다.
-
-  이는 concurrently를 이용하여 사용자가 client와 server를 동시에 실행할 수 있게 해준다.
-
-Run the client & server with concurrently
-
-Server runs on http://localhost:5000 and client on http://localhost:3000
-
-> `npm run dev`
+- `./package.json` file
 
 ```
-// package.json in mern_shopping_list folder
 {
-  "name": "mern_shopping_list",
+  "name": "mern_guideline",
   "version": "1.0.0",
-  "description": "Shopping List built with the MERN stack",
-  "main": "server.js",
+  "description": "Goal setter built with the MERN stack",
+  "main": "backend/server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "server": "nodemon server.js",
+    "start": "node backend/server.js",
+    "server": "nodemon backend/server.js",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "client-install": "npm install --prefix client"
@@ -1250,56 +1211,240 @@ Server runs on http://localhost:5000 and client on http://localhost:3000
 }
 ```
 
+- `"client": "cd client && npm start"` 또는 `"client": "npm start --prefix client"`: 사용자가 client folder를 들어가지 않고도 root에서 react app을 실행
+- `"client": "client-install": "npm install --prefix client"` 또는 `"client": "cd client && npm install"`: client folder의 dependencies를 install
+- `"dev": "concurrently \"npm run server\" \"npm run client\""`: concurrently library를 이용하여 client와 server를 동시에 실행
+
+root directory에서 다음의 command을 입력:
+
+```
+// Run the React client only
+$ npm run client
+
+// Install dependencies for client
+$ npm run client-install
+
+// Install dependencies for backend
+$ npm i
+또는
+$ npm install
+
+// Run the client & server together with concurrently
+// Server runs on http://localhost:5000 and client on http://localhost:3000
+$ npm run dev
+```
+
 ### 2. Install dependencies for client
 
-Go to the client folder and install dependencies.
+Go to the client folder and install dependencies for client.
 
-> `cd client`
+- `redux-toolkit`: state관리 library
+- `tailwindcss`: css framework로 기본적인 styling를 제공합니다.
+- `headlessui`: tailwindcss와 같이 사용되는 react, vue css library
+- `heroicons`: tailwindcss와 같이 사용되는 react, vue SVG icons library
 
-- `bootstrap`: frontend dev에 대한 구조를 미리 만들어둔 프레임워크입니다. 기본적인 css, js를 제공합니다.
-- `reactstrap`: bootstrap component를 react component로 사용할 수 있게 만들어 준다.
-- `react-transition-group`: exposes simple components useful for defining entering and exiting transitions.
+```
+$ cd client
+$ npm i @reduxjs/toolkit @headlessui/react @heroicons/react
 
-> `npm i bootstrap reactstrap react-transition-group`
+// Install Tailwind CSS with Next.js
+$ npm install -D tailwindcss postcss autoprefixer
+$ npx tailwindcss init -p
+```
 
-### 3. src folder에 component folder를 만들기
+- `./client/tailwind.config.js` file
 
-- src folder에 component folder를 만든다.
-- component folder에 AppNavbar.js를 만든다.
+```
+module.exports = {
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+```
 
-VScode extension인 `ES7+ React/Redux/React-Native snippets`을 download하면 `rafce`만 code에 입력하면 arrow function이 자동적으로 완성된다.
+- `./client/styles/globals.css` file
 
-AppNavbar.js는 reactstrap의 Navbar Toggler component를 사용할 것이다.
-이 Navbar를 클락하면 그 안에 있는 links가 보이는 형식이다.
+```
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
 
-reactstrap: https://reactstrap.github.io/?path=/docs/components-navbar--navbar
+`postcss/config.js`와 `tailwind.config.js`가 complie이 안된다면 adding `prettier` in `.eslintrc file`
 
-위의 링크로 가서 `component/navbar`를 가져온다.
+- `./client/.eslintrc.json` file
 
-### 9. Create src/components/ShoppingList.jsx
+```
+{
+  "extends": ["next/core-web-vitals", "prettier"]
+}
+```
 
-reactstrap: https://reactstrap.github.io/?path=/docs/components-listgroup--list-group
+- Run your build process with `npm run dev`.
 
-위의 링크로 가서 `component/ListGroup`를 가져온다.
+이제 이 project에서 Tailwindcss와 Next.js를 동시에 사용할 수 있게 되었다.
 
-server에 있는 data를 client에서 Get/Post/Delete하도록 간단히 만들어 준다.
+- [Tailwind with Next.js](https://tailwindcss.com/docs/guides/nextjs)
 
-### 10. Implementing Redux
+### 3. Create component directory and build a layout
 
-client fodler에서 dependencies를 install한다.
+```
+// components directory 생성
+$ mkdir components
+$ cd components
+$ touch Navbar.tsx
+$ touch Footer.tsx
+$ touch Layout.tsx
 
-> `cd client`
+// 각각의 file에다 rafce 입력
+```
 
-- `redux`:
-- `react-redux`:
-- `redux-thunk`:
+set primary color and many other colors
 
-> `npm i redux react-redux redux-thunk` > `npm i -D redux react-redux redux-thunk`
+- `./client/tailwind.config.js` file
 
-- client/src에 store.js 만들기
-- App.js에 Provider 추가
+```
+module.exports = {
+  ...
+  theme: {
+    extend: {
+      colors: {
+        primary: "#ff4800",
+        gold: "#ffd700",
+      },
+    },
+  },
+  plugins: [],
+};
+
+// `text-primary`, `text-gold`와 같이 사용해
+// 지정한 색깔을 사용할 수 있다.
+```
+
+tailwindcss를 이용해 나만의 class만들기
+
+- `./client/styles/globals.css` file
+
+```
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.btn-purple {
+  @apply text-indigo-600 hover:text-indigo-500;
+}
+```
+
+`@apply`를 이용하면 여러 tailwindcss를 하나의 className으로 묶을 수 있다.
+
+```
+<a className="btn-purple">Sign in</a>
+// is equivalent to
+<a className="text-indigo-600 hover:text-indigo-500">Sign in</a>
+```
+
+Tailwindcss website에 있는 Navbar, Footer template를 가져와 다음에 붙여넣기 후 내 project에 맞게 변경한다.
+
+- `./client/components/Navbar.tsx`
+- `./client/components/Footer.tsx`
+
+Tip: Next에서 page간 이동은 `Link`, img는 `Image` tag를 사용한다.
+
+```
+import Image from "next/image"
+import Link from "next/link"
+
+<a className="btn-purple" href="/login">Sign in</a>
+// is equivalent to
+<Link href="login">
+<a className="btn-purple">Sign in</a>
+<Link>
+
+<img className="h-8 w-auto" alt="Logo" src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg" />
+// is equivalent to
+<Image
+  className="sm:h-10 cursor-pointer"
+  src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
+  alt="Logo"
+  height="32"
+  width="100%"
+/>
+```
+
+To use external img source, add domain name to `next.config.js` file
+
+- `next.config.js` file
+
+```
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  images: {
+    domains: ["tailwindui.com"],
+    loader: "custom",
+    path: "/",
+  },
+};
+
+module.exports = nextConfig;
+```
+
+- `./client/components/Layout.tsx` file
+
+```
+import Navbar from "./Navbar";
+import Footer from "./Footer";
+
+type LayoutProps = {
+  children: React.ReactNode;
+};
+
+const Layout = ({ children }: LayoutProps) => {
+  return (
+    <>
+      <Navbar />
+      <main>{children}</main>
+      <Footer />
+    </>
+  );
+};
+
+export default Layout;
+```
+
+- `./client/_app.tsx` file
+
+```
+import "../styles/globals.css";
+import Layout from "../components/Layout";
+import type { AppProps } from "next/app";
+
+function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    <Layout>
+      <Component {...pageProps} />
+    </Layout>
+  );
+}
+
+export default MyApp;
+```
+
+- Commit git file
+
+```
+$ cd ..
+$ git add .
+$ git commit -m "set up client with tailwindcss and basic layout"
+```
+
+### 4. Login and Register pages
 
 ## Reference
 
 - Youtube Link: https://www.youtube.com/watch?v=5yTazHkDR4o&list=PLillGF-RfqbbiTGgA77tGO426V3hRF9iE&index=3&ab_channel=TraversyMedia
-- Github Link: https://github.com/bradtraversy/mern_shopping_list

@@ -26,6 +26,7 @@ app.use("/api/users", userRoutes);
 app.use(errorHandler);
 
 // Serve static assets if in production
+// Serve frontend
 if (process.env.NODE_ENV === "production") {
   // Set static folder
   app.use(express.static("client/build"));
