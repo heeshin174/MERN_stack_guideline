@@ -5,3 +5,20 @@
 .btn-purple {
   @apply text-indigo-600 hover:text-indigo-500;
 }
+
+.form-group {
+  @apply mb-3;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  @apply appearance-none rounded-none relative block w-full px-5 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm
+
+  /* border: 1px solid #e6e6e6;
+  font-family: inherit; */;
+}
+
+.btn {
+  @apply bg-black cursor-pointer text-center flex justify-center;
+}

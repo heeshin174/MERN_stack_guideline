@@ -108,13 +108,15 @@ const Navbar = () => {
           <div className="flex justify-start lg:w-0 lg:flex-1">
             <span className="sr-only">Workflow</span>
             <Link href="/">
-              <Image
-                className="sm:h-10 cursor-pointer"
-                src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
-                alt="Logo"
-                height="32"
-                width="100%"
-              />
+              <a className="sm:h-10 cursor-pointer">
+                <Image
+                  src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
+                  alt="Logo"
+                  height="32"
+                  width="100%"
+                  priority
+                />
+              </a>
             </Link>
           </div>
           <div className="-mr-2 -my-2 md:hidden">
@@ -290,8 +292,7 @@ const Navbar = () => {
                               href="#"
                               className="font-medium text-indigo-600 hover:text-indigo-500"
                             >
-                              {" "}
-                              View all posts{" "}
+                              View all posts
                               <span aria-hidden="true">&rarr;</span>
                             </a>
                           </div>
@@ -304,18 +305,16 @@ const Navbar = () => {
             </Popover>
           </Popover.Group>
           <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-            <a
-              href="#"
-              className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900"
-            >
-              Sign in
-            </a>
-            <a
-              href="#"
-              className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-            >
-              Sign up
-            </a>
+            <Link href="/login">
+              <a className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
+                Sign in
+              </a>
+            </Link>
+            <Link href="/register">
+              <a className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                Sign up
+              </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -338,12 +337,15 @@ const Navbar = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <Link href="/">
-                    <Image
-                      src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
-                      alt="Workflow"
-                      height="32"
-                      width="100%"
-                    />
+                    <a>
+                      <Image
+                        src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
+                        alt="Workflow"
+                        height="32"
+                        width="100%"
+                        priority
+                      />
+                    </a>
                   </Link>
                 </div>
                 <div className="-mr-2">
