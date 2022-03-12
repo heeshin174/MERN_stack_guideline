@@ -1,7 +1,7 @@
 import axios from "axios";
 import { registerData, loginData } from "../userData";
 
-const API_URL = "/users/";
+const API_URL = "api/users/";
 
 // Register user
 const register = async (userData: registerData) => {

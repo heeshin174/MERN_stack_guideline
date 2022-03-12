@@ -1186,6 +1186,36 @@ create-react-app은 기존의 backend에서 쓰는 `package.json`과는 다른 �
 }
 ```
 
+하지만, Next에서 위의 `proxy`는 제대로 동작하지 않는다. 제대로 proxy하려면 `next.config.js` file에 작성해야 한다.
+
+- `./client/next.config.js` file
+
+```
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  rewrites: async () => [
+    {
+      source: "/api/users/:slug*",
+      destination: `http://localhost:5000/api/users/:slug*`,
+    },
+    {
+      source: "/api/goals/:slug*",
+      destination: `http://localhost:5000/api/goals/:slug*`,
+    },
+  ],
+
+  images: {
+    domains: ["tailwindui.com"],
+    path: "/",
+  },
+};
+
+module.exports = nextConfig;
+```
+
+이렇게 `rewrites()`를 작성하면 source 로 오는 http request를 destination으로 redirect한다.
+
 우리는 두 개의 `package.json`이 있기 때문에 `client` folder내에서 `npm start`를 입력하면 react가 실행되고, root directory에서 `npm start`를 입력하면 `./backend/server.js`가 실행된다. 이 두 개의 command를 root에서 동시에 사용하기 위해 `concurrently` dependency를 설치한다.
 
 - `concurrently`: run more than one `npm` scripts at a time, so that we are able to run the server and the client at a same time.
@@ -1470,7 +1500,7 @@ $ git commit -m "login and  register UI"
 - `./client/features/auth/authSlice.ts`
   - `authSlice`는 user authentication에 대한 reducer, action creator function, initial state를 모아둔 redux-toolkit function 이다.
 - `./client/features/auth/authService.ts`
-  - `authService`는 user authentication에 대한 http를 담당하는 file이다.
+  - `authService`는 user authentication에 대한 http request를 담당하는 file이다.
 - `./client/features/rootReducer.ts`
   - `rootReducer`는 `useSelector`를 typescript에서 이용 시 간단하게 사용하기 위한 custom hook이다.
 - `./client/features/userData.ts`
@@ -1546,7 +1576,7 @@ const register = () => {
 
     if (isSuccess || user) {
       // navigate to 'pages/index.tsx' page
-      router.push("/index");
+      router.push("/");
     }
 
     dispatch(reset);

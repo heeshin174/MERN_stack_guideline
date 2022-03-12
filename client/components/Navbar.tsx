@@ -112,7 +112,7 @@ const Navbar = () => {
   const onLogout = () => {
     dispatch(logoutUser());
     dispatch(reset());
-    router.push("/index");
+    router.push("/");
   };
 
   return (
@@ -322,7 +322,7 @@ const Navbar = () => {
             {user ? (
               <>
                 <button
-                  className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900"
+                  className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700"
                   onClick={onLogout}
                 >
                   Sign out
@@ -436,12 +436,11 @@ const Navbar = () => {
                   </>
                 ) : (
                   <>
-                    <p className="mt-6 text-center text-base font-medium text-gray-500">
-                      Existing customer?
-                      <Link href="/login">
-                        <a className="btn-purple">Sign in</a>
-                      </Link>
-                    </p>
+                    <Link href="/login">
+                      <a className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                        Sign in
+                      </a>
+                    </Link>
                     <Link href="/register">
                       <a className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700">
                         Sign up

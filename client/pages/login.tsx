@@ -34,7 +34,7 @@ const login = () => {
 
     if (isSuccess || user) {
       // navigate to 'pages/index.tsx' page
-      router.push("/index");
+      router.push("/");
     }
 
     dispatch(reset);
