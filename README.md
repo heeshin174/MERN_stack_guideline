@@ -61,7 +61,7 @@ type을 module로 해야지만 file을 내보내고/가져올 때, `module.expor
 - `dotenv`: set the environment variable so that hide all of our secret information.
 - `colors`: get color and style
 
-- `body-parser` library: POST 요청시 body 데이터값을 읽을 수 있는 구문으로 parsing한다 (Object => Json). Express v4.16.0 기준으로 body-parser가 built-in 되어 별도의 설치 없이 아래와 같이 이용가능하다.
+- `body-parser`: POST 요청시 body 데이터값을 읽을 수 있는 구문으로 parsing한다 (Object => Json). Express v4.16.0 기준으로 body-parser가 built-in 되어 별도의 설치 없이 아래와 같이 이용가능하다.
 
 ```
 const express = require('express');
@@ -1203,7 +1203,7 @@ create-react-app은 기존의 backend에서 쓰는 `package.json`과는 다른 �
   "scripts": {
     "start": "node backend/server.js",
     "server": "nodemon backend/server.js",
-    "client": "npm start --prefix client",
+    "client": "npm run dev --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "client-install": "npm install --prefix client"
   },
@@ -1211,7 +1211,7 @@ create-react-app은 기존의 backend에서 쓰는 `package.json`과는 다른 �
 }
 ```
 
-- `"client": "cd client && npm start"` 또는 `"client": "npm start --prefix client"`: 사용자가 client folder를 들어가지 않고도 root에서 react app을 실행
+- `"client": "cd client && npm run dev"` 또는 `"client": "npm run dev --prefix client"`: 사용자가 client folder를 들어가지 않고도 root에서 react app을 실행
 - `"client": "client-install": "npm install --prefix client"` 또는 `"client": "cd client && npm install"`: client folder의 dependencies를 install
 - `"dev": "concurrently \"npm run server\" \"npm run client\""`: concurrently library를 이용하여 client와 server를 동시에 실행
 
@@ -1239,13 +1239,16 @@ $ npm run dev
 Go to the client folder and install dependencies for client.
 
 - `redux-toolkit`: state관리 library
+- `react-redux`: react 개발환경의 redux
 - `tailwindcss`: css framework로 기본적인 styling를 제공합니다.
 - `headlessui`: tailwindcss와 같이 사용되는 react, vue css library
 - `heroicons`: tailwindcss와 같이 사용되는 react, vue SVG icons library
+- `axios`: Promise-based HTTP Client for node.js and the browser. It is isomorphic (= it can run in the browser and nodejs with the same codebase)
+- `react-toastify`: shows error, alert, and success alert
 
 ```
 $ cd client
-$ npm i @reduxjs/toolkit @headlessui/react @heroicons/react
+$ npm i @reduxjs/toolkit @headlessui/react @heroicons/react react-redux axios react-toastify
 
 // Install Tailwind CSS with Next.js
 $ npm install -D tailwindcss postcss autoprefixer
@@ -1355,6 +1358,8 @@ Tailwindcss website에 있는 Navbar, Footer template를 가져와 다음에 붙
 
 Tip: Next에서 page간 이동은 `Link`, img는 `Image` tag를 사용한다.
 
+- `Link`는 anchor `<a>` tag을 자식으로 가져야만 한다.
+
 ```
 import Image from "next/image"
 import Link from "next/link"
@@ -1386,7 +1391,7 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     domains: ["tailwindui.com"],
-    loader: "custom",
+    // loader: "custom",
     path: "/",
   },
 };
@@ -1445,6 +1450,146 @@ $ git commit -m "set up client with tailwindcss and basic layout"
 
 ### 4. Login and Register pages
 
+- Create login and register page
+- Tailwindcss website에 있는 login template를 가져와 다음에 붙여넣기 후 내 project에 맞게 변경한다.
+
+- `./client/pages/Login.tsx` file
+- `./client/pages/Register.tsx` file
+
+login과 register는 비슷하기 때문에, 조금만 변경해주면 된다.
+
+- Commit git file
+
+```
+$ git add .
+$ git commit -m "login and  register UI"
+```
+
+### 5. Redux-toolkit setup
+
+- `./client/features/auth/authSlice.ts`
+  - `authSlice`는 user authentication에 대한 reducer, action creator function, initial state를 모아둔 redux-toolkit function 이다.
+- `./client/features/auth/authService.ts`
+  - `authService`는 user authentication에 대한 http를 담당하는 file이다.
+- `./client/features/rootReducer.ts`
+  - `rootReducer`는 `useSelector`를 typescript에서 이용 시 간단하게 사용하기 위한 custom hook이다.
+- `./client/features/userData.ts`
+
+  - `userData`는 사용자가 입력할 데이터 interface이다.
+
+- `./client/pages/_app.tsx` file
+
+```
+import "../styles/globals.css";
+import Layout from "../components/Layout";
+import type { AppProps } from "next/app";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Provider } from "react-redux";
+import { store } from "../app/store";
+
+function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    <Provider store={store}>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+      <ToastContainer />
+    </Provider>
+  );
+}
+
+export default MyApp;
+```
+
+- `./client/components/Navbar.tsx` file
+  - Navbar에 user가 있으면 sign out를 없으면 sign up, log in를 보여주는 conditional statement 추가
+- `./client/components/Spinner.tsx` file
+
+  - 로딩중에 보여줄 Spinner
+
+- `./client/pages/register.tsx` file
+- `./client/pages/Login.tsx` file
+
+login과 register는 비슷하기 때문에, 조금만 변경해주면 된다.
+
+```
+// useSelector: used to select from the state. bring user, isLoading, isError, etc from state.
+// useDispatch: dispatch the function like reguster, Asyncthunk functions, reset reducer from
+
+type UserData = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
+
+const register = () => {
+  const [formData, setformData] = useState<UserData>({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const { name, email, password, confirmPassword } = formData;
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const { user, isLoading, isError, isSuccess, message } = useRootState(
+    (state) => state.auth
+  );
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+
+    if (isSuccess || user) {
+      // navigate to 'pages/index.tsx' page
+      router.push("/index");
+    }
+
+    dispatch(reset);
+  }, [user, isLoading, isError, isSuccess, message]);
+
+  const onChange = (e: React.FormEvent) => {
+    setformData((prevState) => ({
+      ...prevState,
+      [(e.target as HTMLInputElement).name]: (e.target as HTMLInputElement)
+        .value,
+    }));
+  };
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (password != confirmPassword) {
+      toast.error("Passwords do not match");
+    } else {
+      const userData = {
+        name,
+        email,
+        password,
+      };
+
+      dispatch(registerUser(userData));
+    }
+  };
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+  ...
+}
+```
+
+- Commit git file
+
+```
+$ git add .
+$ git commit -m "user login and register in UI/UX"
+```
+
 ## Reference
 
-- Youtube Link: https://www.youtube.com/watch?v=5yTazHkDR4o&list=PLillGF-RfqbbiTGgA77tGO426V3hRF9iE&index=3&ab_channel=TraversyMedia
+- [Youtube Link](https://www.youtube.com/watch?v=5yTazHkDR4o&list=PLillGF-RfqbbiTGgA77tGO426V3hRF9iE&index=3&ab_channel=TraversyMedia)
+- [Github](https://github.com/bradtraversy/mern-tutorial)

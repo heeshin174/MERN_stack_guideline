@@ -18,6 +18,10 @@ import {
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/router";
+import { useDispatch } from "react-redux";
+import { logoutUser, reset } from "../features/auth/authSlice";
+import { useRootState } from "../features/rootReducer";
 
 const solutions = [
   {
@@ -101,6 +105,16 @@ function classNames(...classes: any) {
 }
 
 const Navbar = () => {
+  const dispatch = useDispatch();
+  const { user } = useRootState((state) => state.auth);
+  const router = useRouter();
+
+  const onLogout = () => {
+    dispatch(logoutUser());
+    dispatch(reset());
+    router.push("/index");
+  };
+
   return (
     <Popover className="relative bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -305,16 +319,29 @@ const Navbar = () => {
             </Popover>
           </Popover.Group>
           <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-            <Link href="/login">
-              <a className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
-                Sign in
-              </a>
-            </Link>
-            <Link href="/register">
-              <a className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700">
-                Sign up
-              </a>
-            </Link>
+            {user ? (
+              <>
+                <button
+                  className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900"
+                  onClick={onLogout}
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login">
+                  <a className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
+                    Sign in
+                  </a>
+                </Link>
+                <Link href="/register">
+                  <a className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                    Sign up
+                  </a>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -401,17 +428,27 @@ const Navbar = () => {
                 ))}
               </div>
               <div>
-                <Link href="/register">
-                  <a className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700">
-                    Sign up
-                  </a>
-                </Link>
-                <p className="mt-6 text-center text-base font-medium text-gray-500">
-                  Existing customer?{" "}
-                  <Link href="/about">
-                    <a className="btn-purple">Sign in</a>
-                  </Link>
-                </p>
+                {user ? (
+                  <>
+                    <button className="btn-purple" onClick={onLogout}>
+                      Sign out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="mt-6 text-center text-base font-medium text-gray-500">
+                      Existing customer?
+                      <Link href="/login">
+                        <a className="btn-purple">Sign in</a>
+                      </Link>
+                    </p>
+                    <Link href="/register">
+                      <a className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                        Sign up
+                      </a>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -1,6 +1,11 @@
-import { useState } from "react";
-import Link from "next/link";
+import { useState, useEffect } from "react";
 import { LockClosedIcon, UserAddIcon } from "@heroicons/react/solid";
+import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
+import { registerUser, reset } from "../features/auth/authSlice";
+import { useRootState } from "../features/rootReducer";
+import { useRouter } from "next/router";
+import Spinner from "../components/Spinner";
 
 type UserData = {
   name: string;
@@ -18,6 +23,24 @@ const register = () => {
   });
 
   const { name, email, password, confirmPassword } = formData;
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const { user, isLoading, isError, isSuccess, message } = useRootState(
+    (state) => state.auth
+  );
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+
+    if (isSuccess || user) {
+      // navigate to 'pages/index.tsx' page
+      router.push("/index");
+    }
+
+    dispatch(reset);
+  }, [user, isLoading, isError, isSuccess, message]);
 
   const onChange = (e: React.FormEvent) => {
     setformData((prevState) => ({
@@ -30,15 +53,21 @@ const register = () => {
     e.preventDefault();
 
     if (password != confirmPassword) {
-      console.log("Passwords do not match");
+      toast.error("Passwords do not match");
     } else {
       const userData = {
         name,
         email,
         password,
       };
+
+      dispatch(registerUser(userData));
     }
   };
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="min-h-full flex-col items-center justify-center py-12 px-20%">

@@ -1,6 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { LockClosedIcon, LoginIcon } from "@heroicons/react/solid";
+import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
+import { loginUser, reset } from "../features/auth/authSlice";
+import { useRootState } from "../features/rootReducer";
+import { useRouter } from "next/router";
+import Spinner from "../components/Spinner";
 
 type UserLogin = {
   email: string;
@@ -14,6 +20,25 @@ const login = () => {
   });
 
   const { email, password } = formData;
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const { user, isLoading, isError, isSuccess, message } = useRootState(
+    (state) => state.auth
+  );
+
+  // user, isLoading, isError, isSuccess, message 변경 시 useEffect fires off
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+
+    if (isSuccess || user) {
+      // navigate to 'pages/index.tsx' page
+      router.push("/index");
+    }
+
+    dispatch(reset);
+  }, [user, isLoading, isError, isSuccess, message]);
 
   const onChange = (e: React.FormEvent) => {
     setformData((prevState) => ({
@@ -22,9 +47,18 @@ const login = () => {
         .value,
     }));
   };
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const userData = { email, password };
+
+    dispatch(loginUser(userData));
   };
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="min-h-full flex-col items-center justify-center py-12 px-20%">
