@@ -21,7 +21,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import { logoutUser, reset } from "../features/auth/authSlice";
-import { useRootState } from "../features/rootReducer";
+import { useRootState } from "../app/hooks";
 
 const solutions = [
   {

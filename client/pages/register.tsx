@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { LockClosedIcon, UserAddIcon } from "@heroicons/react/solid";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "../app/hooks";
 import { toast } from "react-toastify";
 import { registerUser, reset } from "../features/auth/authSlice";
-import { useRootState } from "../features/rootReducer";
+import { useRootState } from "../app/hooks";
 import { useRouter } from "next/router";
 import Spinner from "../components/Spinner";
 
@@ -24,7 +24,7 @@ const register = () => {
 
   const { name, email, password, confirmPassword } = formData;
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { user, isLoading, isError, isSuccess, message } = useRootState(
     (state) => state.auth
   );

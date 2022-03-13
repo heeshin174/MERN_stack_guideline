@@ -6,6 +6,7 @@ import colors from "colors";
 import { connectDB } from "./config/db.js";
 import dotenv from "dotenv";
 import userRoutes from "./routes/api/userRouters.js";
+import path from "path";
 
 // get .env file variables
 dotenv.config();
@@ -31,9 +32,13 @@ if (process.env.NODE_ENV === "production") {
   // Set static folder
   app.use(express.static("client/build"));
 
-  // app.get('*', (req, res) => {
-  //   res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-  // });
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+} else {
+  app.get("/", (req, res) => {
+    res.send("please set to production");
+  });
 }
 
 export default app;

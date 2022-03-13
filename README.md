@@ -4,7 +4,7 @@ Learn the MERN Stack
 
 - M: MongoDB (Database)
 - E: Express.js (Server)
-- R: React.js (Frontend)
+- R: React.js + Next.js + Redux-toolkit (Frontend)
 - N: Node.js
 
 만약 Window Subsystem for Linux (WSL)에서 코드를 작업 중이라면 `$ wsl hostname -I`를 Window terminal에 입력 후, localhost를 결과값으로 변경한다.
@@ -17,6 +17,10 @@ Learn the MERN Stack
 Window: GET http://localhost:5000/api/users/me
 WSL: GET http://172.29.69.223:5000/api/users/me
 ```
+
+![register](img/register.png)
+![reduxdevtool](img/reduxdevtool.png)
+![screen1](img/screen1.png)
 
 ## Used Technologies
 
@@ -1495,14 +1499,16 @@ $ git add .
 $ git commit -m "login and  register UI"
 ```
 
-### 5. Redux-toolkit setup
+### 5. Redux-toolkit Auth setup
 
 - `./client/features/auth/authSlice.ts`
   - `authSlice`는 user authentication에 대한 reducer, action creator function, initial state를 모아둔 redux-toolkit function 이다.
 - `./client/features/auth/authService.ts`
   - `authService`는 user authentication에 대한 http request를 담당하는 file이다.
-- `./client/features/rootReducer.ts`
-  - `rootReducer`는 `useSelector`를 typescript에서 이용 시 간단하게 사용하기 위한 custom hook이다.
+- `./client/app/store.ts`
+  - `store`는 state를 관리하고 update하는 redux store이다.
+- `./client/app/hooks.ts`
+  - `hooks`는 typescript에서 `useSelector(), useDispatch()`를 간단하게 사용하기 위한 custom hook이다.
 - `./client/features/userData.ts`
 
   - `userData`는 사용자가 입력할 데이터 interface이다.
@@ -1617,6 +1623,97 @@ const register = () => {
 ```
 $ git add .
 $ git commit -m "user login and register in UI/UX"
+```
+
+### 6. Redux-toolkit Goal set up
+
+- `./client/features/goals/goalSlice.ts`
+  - `goalSlice`는 goal에 대한 reducer, action creator function, initial state를 모아둔 redux-toolkit function 이다.
+- `./client/features/goals/goalService.ts`
+  - `goalService`는 goal에 대한 http request를 담당하는 file이다.
+- `./client/features/goalData.ts`
+
+  - `goalData`는 사용자가 입력할 goal data interface이다.
+
+- `./client/components/Dashboard.tsx`
+  - `Dashboard`는 사용자의 goal를 보여주는 UI이다.
+- `./client/components/GoalForm.tsx`
+  - `GoalForm`는 사용자의 goal를 input 받는 form이다.
+- `./client/components/GoalItem.tsx`
+  - `GoalItem`는 사용자의 goal를 보여주는 UI이다.
+
+## 5. Deployment
+
+- `./backend/`
+
+```
+import path from 'path';
+
+// Serve static assets if in production
+// Serve frontend
+if (process.env.NODE_ENV === "production") {
+  // Set static folder
+  app.use(express.static("client/build"));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+} else {
+  app.get("/", (req, res) => {
+    res.send("please set to production");
+  });
+}
+```
+
+`env` file에 `NODE_ENV = production`를 입력하면 이제 `https:localhost:5000`으로 접속해도 client directory의 UI를 볼 수 있다.
+
+- go to client directory and build static assets.
+
+```
+$ cd client
+$ npm run build
+// this will generate build directory
+```
+
+- go to 'https://heroku.com' and create account
+- download `heroku cli` (command line)
+
+```
+$ heroku --version
+$ heroku login
+
+// create heroku app
+// This should be unique for all heroku app
+$ heroku create uniqueprojectname
+```
+
+- go to application and `Settings > Reveal Config Vars` to set enviornment variables in `.env` file
+
+- add heroku postbuild script in `./package.json`
+
+```
+"scripts": {
+    "start": "node backend/server.js",
+    "server": "nodemon backend/server.js",
+    "client": "npm run dev --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "client-install": "npm install --prefix client",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
+  },
+```
+
+`heroku-postbuild`는 heroku server가 자동으로 client directory의 dependencies와 build static assets를 실행한다.
+
+- push code using git command
+
+```
+$ git add .
+$ git commit -m 'Prepare deployment'
+$ git remote https:...
+$ git push heroku main
+
+$ heroku open
+// open heroku app in the browser
 ```
 
 ## Reference

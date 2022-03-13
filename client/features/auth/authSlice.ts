@@ -1,15 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import authService from "./authService";
 import { AxiosError } from "axios";
-import { registerData, loginData } from "../userData";
-
-interface iniState {
-  user: string | null;
-  isError: boolean;
-  isSuccess: boolean;
-  isLoading: boolean;
-  message: any;
-}
+import { userState, registerData, loginData } from "../userData";
 
 // Get user from localStorage
 const ISSERVER = typeof window === "undefined";
@@ -20,7 +12,7 @@ if (!ISSERVER) {
   user = null;
 }
 
-const initialState: iniState = {
+const initialState: userState = {
   user: user ? user : null,
   isError: false,
   isSuccess: false,
@@ -94,11 +86,14 @@ export const authSlice = createSlice({
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(registerUser.fulfilled, (state, action: PayloadAction<string>) => {
-        state.isLoading = false;
-        state.isSuccess = true;
-        state.user = action.payload;
-      })
+      .addCase(
+        registerUser.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.isLoading = false;
+          state.isSuccess = true;
+          state.user = action.payload;
+        }
+      )
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
