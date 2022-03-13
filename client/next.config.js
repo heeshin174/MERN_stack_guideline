@@ -4,11 +4,11 @@ const nextConfig = {
   rewrites: async () => [
     {
       source: "/api/users/:slug*",
-      destination: `http://172.29.74.246:5000/api/users/:slug*`,
+      destination: `http://localhost:5000/api/users/:slug*`,
     },
     {
       source: "/api/goals/:slug*",
-      destination: `http://172.29.74.246:5000/api/goals/:slug*`,
+      destination: `http://localhost:5000/api/goals/:slug*`,
     },
   ],
 
