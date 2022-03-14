@@ -1,6 +1,6 @@
 # MERN  Stack GUIDELINE
 
-This is personal documentation from [Youtube Link](https://www.youtube.com/watch?v=5yTazHkDR4o&list=PLillGF-RfqbbiTGgA77tGO426V3hRF9iE&index=3&ab_channel=TraversyMedia). You can check more information on [Github](https://github.com/bradtraversy/mern-tutorial).
+This is personal documentation from [Youtube Link](https://www.youtube.com/watch?v=-0exw-9YJBo). You can check more information on [Github](https://github.com/bradtraversy/mern-tutorial).
 
 - Learn the MERN Stack
   - M: MongoDB (Database)
