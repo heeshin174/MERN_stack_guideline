@@ -1,13 +1,14 @@
-# MERN GUIDELINE
+# MERN  Stack GUIDELINE
 
-Learn the MERN Stack
+This is personal documentation from [Youtube Link](https://www.youtube.com/watch?v=5yTazHkDR4o&list=PLillGF-RfqbbiTGgA77tGO426V3hRF9iE&index=3&ab_channel=TraversyMedia). You can check more information on [Github](https://github.com/bradtraversy/mern-tutorial).
 
-- M: MongoDB (Database)
-- E: Express.js (Server)
-- R: React.js + Next.js + Redux-toolkit (Frontend)
-- N: Node.js
+- Learn the MERN Stack
+  - M: MongoDB (Database)
+  - E: Express.js (Server)
+  - R: React.js + Next.js + Redux-toolkit (Frontend)
+  - N: Node.js
 
-만약 Window Subsystem for Linux (WSL)에서 코드를 작업 중이라면 `$ wsl hostname -I`를 Window terminal에 입력 후, localhost를 결과값으로 변경한다.
+만약 Window Subsystem for Linux (WSL)에서 작업 중이라면 `$ wsl hostname -I`를 Window terminal에 입력 후, localhost를 결과값으로 변경한다.
 즉 localhost로 연결되지 않는 경우, 코드를 local computer가 아닌 다른 곳에 작성 했다는 의미이고, localhost를 그에 맞게 변경한다.
 
 - To close server, type `Ctrl + C`
